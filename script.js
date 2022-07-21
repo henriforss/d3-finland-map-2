@@ -127,7 +127,9 @@ async function createMap() {
     .attr("d", path)
     .on("click", showData)
     .append("title")
-    .text((d) => d.properties.namefin)
+    .text((d) => {
+      return `${d.properties.namefin}, Muutos: ${(d.properties.popchangepercent * 100).toFixed(2)}`
+    })
 }
 
 
