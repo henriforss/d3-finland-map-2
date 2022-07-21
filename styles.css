@@ -4,20 +4,41 @@ svg {
   /* background-color: #eee; */
 }
 
+h1 {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+p {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.7rem;
+  padding: 0;
+}
+
 .municipality {
   stroke: black;
   stroke-width: 0.25px;
 }
 
 .municipality:hover {
-  fill: black;
+  fill: orange;
 }
 
-.div {
+#title {
+  width: 350px;
+  margin: auto;
+}
+
+#footer {
+  width: 350px;
+  margin: auto;
+}
+
+#info {
   display: block;
   margin: auto;
   width: 348px;
   height: 100px;
   text-align: center;
   font-family: Arial, Helvetica, sans-serif;
+  line-height: 0.5;
 }
