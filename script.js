@@ -11,10 +11,17 @@ const svg = d3.select("#map")
 /* Define projection. */
 const projection = d3.geoMercator()
   .scale(1200)
-  .translate([-330, 2130])
+  .translate([-350, 2110])
 
 /* Create path. */
 const path = d3.geoPath(projection)
+
+/* Create background-rect. */
+const background = svg.append("rect")
+  .attr("width", width)
+  .attr("height", height)
+  .attr("fill", "#eeee")
+  .on("click", hideTooltip)
 
 /* Create g-element for paths in map. */
 const map = svg.append("g")
@@ -35,12 +42,12 @@ const linearGradient = defs.append("linearGradient")
   .attr("id", "linear-gradient")
   .attr("x1", "0%")
   .attr("y1", "0%")
-  .attr("x2", "0%")
-  .attr("y2", "100%")
+  .attr("x2", "100%")
+  .attr("y2", "0%")
 
 /* Create "stops" from colorScale. */
 linearGradient.selectAll("stop")
-  .data(colorScale.range().reverse())
+  .data(colorScale.range())
   .enter()
   .append("stop")
   .attr("offset", (d, i) => {
@@ -50,25 +57,26 @@ linearGradient.selectAll("stop")
 
 /* Create the rect that contains the gradient, referenced by id. */
 legend.append("rect")
-  .attr("width", 10)
-  .attr("height", 200)
+  .attr("width", 300)
+  .attr("height", 10)
   .style("fill", "url(#linear-gradient)")
-  .attr("transform", "translate(20, 50)")
+  .attr("transform", "translate(25, 560)")
 
 /* Create some lines on the gradient. */
 legend.selectAll("line")
-  .data([1, 2, 3, 4, 5])
+  .data([0, 1, 2, 3, 4])
   .enter()
   .append("line")
   .attr("x1", 0)
   .attr("y1", 0)
-  .attr("x2", 10)
-  .attr("y1", 0)
+  .attr("x2", 0)
+  .attr("y2", 10)
   .style("stroke", "black")
   .style("stroke-width", 0.25)
   .attr("transform", d => {
-    const y = 50
-    return `translate(20, ${d * y})`
+    const start = 25
+    const x = 75
+    return `translate(${d * x + start}, 560)`
   })
 
 /* Append some text to the gradient. */
@@ -76,15 +84,15 @@ legend.selectAll("text")
   .data(["5%", "2.5%", "0%", "-2.5%", "-5%"])
   .enter()
   .append("text")
-  .attr("x", 40)
-  .attr("y", (d, i) => {
-    return `${(i + 1) * 50 + 5}`
+  .attr("y", 590)
+  .attr("x", (d, i) => {
+
+    return `${(i) * 75 + 20}`
   })
   .text(d => d)
-  .attr("stroke", "redblack")
   .attr("font-size", "0.7rem")
   .attr("font-family", "sans-serif")
-  .attr("opacity", 1)
+  .attr("opacity", 0.8)
 
 /* Define createMap(). This could also be done as a Promise.all.
 Which might make the code more consistent. */
@@ -125,75 +133,64 @@ async function createMap() {
     .attr("class", "municipality")
     .attr("name", (d) => d.properties.namefin)
     .attr("d", path)
-    .on("click", showData)
-    .append("title")
-    .text((d) => {
-      return `${d.properties.namefin}, Muutos: ${(d.properties.popchangepercent * 100).toFixed(2)}`
-    })
+    .on("click", showTooltip)
 }
 
+/* Select tooltip-element. */
+const tooltip = d3.select("#tooltip")
 
+/* Create p-element inside tooltip-div. */
+const tooltipNode = document.getElementById("tooltip")
+const tooltipNodeElement = document.createElement("p")
+tooltipNode.appendChild(tooltipNodeElement)
 
+/* Function to show tooltip. */
+function showTooltip(event) {
 
+  const selected = d3.select(this)
+  const selectedProperties = selected._groups[0][0].__data__.properties
 
+  const x = event.clientX
+  const y = event.clientY + window.scrollY
+    
+  tooltip
+    .style("left", d => `${x - 75}px`)
+    .style("top", d => `${y - 90}px`)
+    .style("visibility", "visible")
 
+  tooltipNodeElement.innerHTML = `<b>${selectedProperties.namefin}</b><br>
+    Väestönlisäys: ${selectedProperties.popchange}<br>
+    Muutos: ${(selectedProperties.popchangepercent * 100).toFixed(2)}`
+}
 
-// const tooltip = d3.select("#tooltip")
-//   .append("div")
+/* Function to hide tooltip. */
+function hideTooltip() {
 
-// function showTooltip(event) {
+  tooltip
+    .style("visibility", "hidden")
+}
 
-//   console.log("moikka")
-
-//   const x = event.clientX
-//   const y = event.clientY
-
-//   const point = new DOMPoint(event.clientX, event.clientY)
-
-//   console.log(x, y)
-//   console.log(point)
-
-//   tooltip.select("rect")
+// /* Define showData() */
+// function showData() {
+//   const clickedMunicipality = d3.select(this).attr("name")
+//   const municipalityNumber = parseInt(d3.select(this).attr("id"))
+  
+//   d3.select("#info")
+//     .selectAll("*")
 //     .remove()
 
-//   tooltip.append("rect")
-//     .attr("width", 100)
-//     .attr("height", 100)
-//     .attr("fill", "red")
-//     .attr("x", point.x)
-//     .attr("y", point.y)
+//   d3.select("#info")
+//     .append("h3")
+//     .text(clickedMunicipality)
+
+//   d3.select("#info")
+//     .append("p")
+//     .text(`Väestönlisäys: ${populationTable[municipalityNumber].popchange}`)
+
+//   d3.select("#info")
+//     .append("p")
+//     .text(`Muutos: ${parseFloat(populationTable[municipalityNumber].popchangepercent * 100).toFixed(2)} %`)
 // }
-
-
-
-
-
-/* Define showData() */
-function showData() {
-  const clickedMunicipality = d3.select(this).attr("name")
-  const municipalityNumber = parseInt(d3.select(this).attr("id"))
-  
-  d3.select("#info")
-    .selectAll("*")
-    .remove()
-
-  d3.select("#info")
-    .append("h3")
-    .text(clickedMunicipality)
-
-  d3.select("#info")
-    .append("p")
-    .text(`Väestönlisäys: ${populationTable[municipalityNumber].popchange}`)
-
-  d3.select("#info")
-    .append("p")
-    .text(`Muutos: ${parseFloat(populationTable[municipalityNumber].popchangepercent * 100).toFixed(2)} %`)
-}
-
-// /* Create div-element. */
-// const div = d3.select("body")
-//   .append("div")
-//   .attr("class", "div")
 
 /* Run createMap(). */
 createMap()

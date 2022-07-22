@@ -1,3 +1,7 @@
+body {
+  margin: 0;
+}
+
 svg {
   display: block;
   margin: auto;
@@ -23,6 +27,10 @@ p {
   fill: orange;
 }
 
+#page {
+  position: relative;
+}
+
 #title {
   width: 350px;
   margin: auto;
@@ -41,4 +49,15 @@ p {
   text-align: center;
   font-family: Arial, Helvetica, sans-serif;
   line-height: 0.5;
+}
+
+#tooltip {
+  position: absolute;
+  visibility: hidden;
+  background-color: white;
+  width: 150px;
+  height: 60px;
+  border-radius: 2px;
+  border: 0.25px solid black;
+  text-align: center;
 }
