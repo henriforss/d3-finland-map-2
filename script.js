@@ -81,7 +81,7 @@ legend.selectAll("line")
 
 /* Append some text to the gradient. */
 legend.selectAll("text")
-  .data(["5%", "2.5%", "0%", "-2.5%", "-5%"])
+  .data(["-5%", "-2.5%", "0%", "2.5%", "5%"])
   .enter()
   .append("text")
   .attr("y", 590)
