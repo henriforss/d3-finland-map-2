@@ -160,7 +160,7 @@ function showTooltip(event) {
 
   tooltipNodeElement.innerHTML = `<b>${selectedProperties.namefin}</b><br>
     Väestönlisäys: ${selectedProperties.popchange}<br>
-    Muutos: ${(selectedProperties.popchangepercent * 100).toFixed(2)}`
+    Muutos: ${(selectedProperties.popchangepercent * 100).toFixed(2)}%`
 }
 
 /* Function to hide tooltip. */
