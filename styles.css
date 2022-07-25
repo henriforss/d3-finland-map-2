@@ -18,13 +18,17 @@ p {
   padding: 0;
 }
 
+select {
+  width: 100%;
+  font-size: 0.9rem;
+  font-family: sans-serif;
+  padding: 5px;
+  border: 0.25px solid black;
+}
+
 .municipality {
   stroke: black;
   stroke-width: 0.25px;
-}
-
-.municipality:hover {
-  fill: orange;
 }
 
 #page {
@@ -60,4 +64,9 @@ p {
   border-radius: 2px;
   border: 0.25px solid black;
   text-align: center;
+}
+
+#dropdown {
+  width: 350px;
+  margin: auto;
 }
