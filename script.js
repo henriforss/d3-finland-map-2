@@ -1,10 +1,10 @@
 /* Variable to choose map. */
 let mapSelector = "population"
 
-/* Event handler to hide tooltips if screen orientation is changed. */
-screen.orientation.addEventListener("change", () => {
-  hideTooltip()
-})
+// /* Event handler to hide tooltips if screen orientation is changed. */
+// screen.orientation.addEventListener("change", () => {
+//   hideTooltip()
+// })
 
 /* Create dropdown menu to select map. */
 const dropdownNode = document.getElementById("dropdown")
