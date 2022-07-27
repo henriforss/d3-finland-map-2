@@ -1,6 +1,11 @@
 /* Variable to choose map. */
 let mapSelector = "population"
 
+/* Event handler to hide tooltips if screen orientation is changed. */
+screen.orientation.addEventListener("change", () => {
+  hideTooltip()
+})
+
 /* Create dropdown menu to select map. */
 const dropdownNode = document.getElementById("dropdown")
 const dropdownNodeElement = document.createElement("select")
@@ -57,10 +62,12 @@ const legend = svg.append("g")
 
 /* Define createMap(). */
 async function createMap(selectedmap) {
+  
+  /* Load and parse data with loadAndParseData(). */
+  const municipalities = await loadAndParseData()
 
   /* Create population map. */
   if (selectedmap == "population") {
-    console.log("popu")
 
     /* Define colorScale. Every map has own colorScale. */
     const colorScale = d3.scaleLinear()
@@ -128,11 +135,11 @@ async function createMap(selectedmap) {
       .attr("font-family", "sans-serif")
       .text("Muutos prosenteissa vuonna 2021 verrattuna vuoteen 2020.")
 
-    const municipalities = await loadAndParseData()
-
+    /* Remove all path-elemenst from map before creating new ones. */
     map.selectAll("path")
       .remove()
 
+    /* Append paths to map. */
     map.selectAll("path")
       .data(municipalities)
       .enter()
@@ -146,11 +153,62 @@ async function createMap(selectedmap) {
 
   /* Create economy map. */
   } else if (selectedmap == "economy") {
-    console.log("eco")
+
+    legend.selectAll("*")
+      .remove()
+
+    map.selectAll("path")
+      .remove()
+
+    map.selectAll("path")
+      .data(municipalities)
+      .enter()
+      .append("path")
+      .attr("id", d => d.properties.natcode)
+      .attr("fill", d => {
+        if (d.properties.profitperperson > 0) {
+          return "blue"
+        } else if (d.properties.profitperperson < 0) {
+          return "orange"
+        } else {
+          return "white"
+        }
+      })
+      .attr("class", "municipality")
+      .attr("name", d => d.properties.namefin)
+      .attr("d", path)
+      .on("click", showTooltip)
+
+    legend.selectAll("rect")
+      .data(["blue", "orange", "white"])
+      .enter()
+      .append("rect")
+      .attr("width", 10)
+      .attr("height", 10)
+      .style("fill", d => d)
+      .attr("transform", (d, i) => {
+        return `translate(${i * 120 + 25}, 560)`
+      })
+      
+      legend.selectAll("text")
+      .data(["Positiivinen", "Negatiivinen", "Ei tietoa"])
+      .enter()
+      .append("text")
+      .attr("font-size", "0.7rem")
+      .attr("font-family", "sans-serif")
+      .text(d => d)
+      .attr("transform", (d, i) => {
+        return `translate(${i * 120 + 40}, 570)`
+      })
+      
+      legend.append("text")
+        .attr("transform", "translate(25, 550)")
+        .attr("font-size", "0.7rem")
+        .attr("font-family", "sans-serif")
+        .text("Tilikauden tulos 2021, euroa/kuntalainen.")
 
   /* Create healthcare map. */
   } else if (selectedmap == "healthcare") {
-    console.log("heca")
 
     const colorScale = d3.scaleLinear()
       .domain([2400, 6800])
@@ -206,9 +264,13 @@ async function createMap(selectedmap) {
       .attr("transform", "translate(25, 550)")
       .attr("font-size", "0.7rem")
       .attr("font-family", "sans-serif")
-      .text("Sote kustannukset yhteensä, euroa/kuntalainen.")
+      .text("Sote yhteensä vuonna 2020, euroa/kuntalainen.*")
 
-    const municipalities = await loadAndParseData()
+    legend.append("text")
+      .attr("transform", "translate(25, 20)")
+      .attr("font-size", "0.7rem")
+      .attr("font-family", "sans-serif")
+      .text("*Pois lukien Ahvenanmaa.")
 
     map.selectAll("path")
       .remove()
@@ -262,14 +324,50 @@ function showTooltip(event) {
   /* Access data through selected path. */
   const selectedProperties = selected._groups[0][0].__data__.properties
 
-  /* Get x and y coordinates. */
-  const x = event.clientX
-  const y = event.clientY + window.scrollY
+  /* Get click x and y coordinates. */
+  let x = event.clientX
+  let y = event.clientY + window.scrollY
+
+  /* Get map border x and y coordinates. Bottom y not needed. */
+  const mapLeftBordeX = (window.innerWidth - 350) / 2
+  const mapRightBorderX = (window.innerWidth - ((window.innerWidth - 350) / 2))
+  const mapTopBorderY = 160 - window.scrollY
+
+  /* Calculate x and y coordinates for map padding.
+  Padding is related to tooltip div size (150x70). */
+  const xPaddingLeft = mapLeftBordeX + 80
+  const xPaddingRight = mapRightBorderX - 80
+  const yPaddingTop = mapTopBorderY + 102.5 + window.scrollY
   
+  /* Calculate padding for top when window is scrolled. */
+  const yPaddingTopScrolled = window.scrollY + 102.5
+
+  /* Use map padding to adjust tooltip x coordinates. */
+  if (x < xPaddingLeft) {    
+    const adjustX = xPaddingLeft - x
+    x = x + adjustX
+  } else if (x > xPaddingRight) {
+    const adjustX = x - xPaddingRight
+    x = x - adjustX
+  }
+
+  /* Use map padding to adjust tooltip y coordinates. */
+  if (y < yPaddingTop) {
+    const adjustY = yPaddingTop - y
+    y = y + adjustY
+  }
+  
+  /* Use map padding to adjust tooltip y coordinates
+  when map is scrolled past top. */
+  if (y < yPaddingTopScrolled) {
+    const adjustY = yPaddingTopScrolled - y
+    y = y + adjustY
+  }
+
   /* Set visibility on tooltip to visible. Also position. */
   tooltip
     .style("left", d => `${x - 75}px`)
-    .style("top", d => `${y - 100}px`)
+    .style("top", d => `${y - 120}px`)
     .style("visibility", "visible")
     .on("click", hideTooltip)
 
@@ -280,12 +378,15 @@ function showTooltip(event) {
       Väestönlisäys: ${selectedProperties.popchange}<br>
       Muutos: ${(selectedProperties.popchangepercent * 100).toFixed(2)}%`
   } else if (mapSelector == "economy") {
-    console.log("2")
-  } else if (mapSelector == "healthcare") {
     tooltipNodeElement.innerHTML = `<b>${selectedProperties.namefin}</b><br>
-    Perusterveydenhoito: ${selectedProperties.basichealthcarecost}<br>
-    Erikoissairaanhoito: ${selectedProperties.specialhealthcarecost}<br>
-    Sote yhteensä: ${selectedProperties.healthcarecost}`
+      Toimintakulut: ${selectedProperties.costperperson}<br>
+      Valtionosuudet: ${selectedProperties.statefinancingperperson}<br>
+      Tilikauden tulos: ${selectedProperties.profitperperson}`
+  } else if (mapSelector == "healthcare") {
+    tooltipNodeElement.innerHTML = `<b>${selectedProperties.namefin}</b><br>
+      Perusterveydenhoito: ${selectedProperties.basichealthcarecost}<br>
+      Erikoissairaanhoito: ${selectedProperties.specialhealthcarecost}<br>
+      Sote yhteensä: ${selectedProperties.healthcarecost}`
   }
 }
 
@@ -313,7 +414,7 @@ async function loadAndParseData() {
   const population = await d3.json("kunnat-vaestonmuutos.json")
 
   /* Create a lookup table. Using reduce() would be fancier. */
-  populationTable = {}
+  const populationTable = {}
   population.data.forEach((d) => {
     const key = parseInt(d.key[1].slice(2))
     const value1 = parseInt(d.values[0]) // absolute change
@@ -336,7 +437,7 @@ async function loadAndParseData() {
   
   /* Load healthcare-file and create a lookup table for healthcare.
   Same as above, but shorter. */
-  healthcareTable = {}
+  const healthcareTable = {}
   const healthcare = await d3.csv("kunnat-terveydenhoito.csv", (data) => {
     const key = data.municipality
     const value1 = parseInt(data.healthcareperperson)
@@ -355,6 +456,29 @@ async function loadAndParseData() {
   municipalities.forEach(d => {
     if (healthcareTable[d.properties.namefin] != undefined) {
       Object.assign(d.properties, healthcareTable[d.properties.namefin])
+    }
+  })
+
+  /* Load economy-file and parse, as above. */
+  const economyTable = {}
+  const economy = await d3.csv("kunnat-talous.csv", (data) => {
+    const key = data.municipality
+    const value1 = parseInt(data.statefinancingperperson)
+    const value2 = parseInt(data.profitperperson)
+    const value3 = parseInt(data.costperperson)
+    
+    /* Create entries for economyTable. */
+    economyTable[key] = {
+      statefinancingperperson: value1,
+      profitperperson: value2,
+      costperperson: value3,
+    }
+  })
+
+  /* Assign value in economyTable to municipalities. */
+  municipalities.forEach(d => {
+    if (economyTable[d.properties.namefin] != undefined) {
+      Object.assign(d.properties, economyTable[d.properties.namefin])
     }
   })
 
