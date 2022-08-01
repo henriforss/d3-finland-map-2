@@ -1,6 +1,10 @@
 /* Variable to choose map. */
 let mapSelector = "population"
 
+/* Define svg-size. */
+const width = 350
+const height = 600
+
 // /* Event handler to hide tooltips if screen orientation is changed. */
 // screen.orientation.addEventListener("change", () => {
 //   hideTooltip()
@@ -24,15 +28,14 @@ function handleSelect(event) {
 
 /* Define projection. */
 const projection = d3.geoMercator()
-  .scale(1200)
-  .translate([-350, 2100])
+  .scale(2800)
+  .rotate([-25, -64.3])
+  .center([0, 0])
+  .translate([width/2, height/2])
 
 /* Create path. */
 const path = d3.geoPath(projection)
 
-/* Define svg-size. */
-const width = 350
-const height = 600
 
 /* Create svg-element. */
 const svg = d3.select("#map")
