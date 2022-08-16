@@ -1,4 +1,4 @@
-# Finland map with D3.js.
+# Finland map with D3.js
 
 This is a Javascript app that uses D3.js to visualize geographical data.
 
