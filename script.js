@@ -2,7 +2,7 @@
 let mapSelector = "population"
 
 /* Define svg-size. */
-const width = 350
+const width = 330
 const height = 600
 
 // /* Event handler to hide tooltips if screen orientation is changed. */
@@ -35,7 +35,6 @@ const projection = d3.geoMercator()
 
 /* Create path. */
 const path = d3.geoPath(projection)
-
 
 /* Create svg-element. */
 const svg = d3.select("#map")
@@ -108,10 +107,10 @@ async function createMap(selectedmap) {
 
     /* Create the rect that contains the gradient, referenced by id. */
     legend.append("rect")
-      .attr("width", 300)
+      .attr("width", 330)
       .attr("height", 10)
       .style("fill", "url(#linear-gradient)")
-      .attr("transform", "translate(25, 560)")
+      .attr("transform", "translate(0, 560)")
   
     /* Remove all text-elements from legend before creating new ones. */
     legend.selectAll("text")
@@ -124,7 +123,7 @@ async function createMap(selectedmap) {
       .append("text")
       .attr("y", 585)
       .attr("x", (d, i) => {
-        return `${(i) * 71 + 25}`
+        return `${(i) * 78.5}`
       })
       .text(d => d)
       .attr("font-size", "0.7rem")
@@ -133,7 +132,7 @@ async function createMap(selectedmap) {
     
     /* Append more text to the legend. */
     legend.append("text")
-      .attr("transform", "translate(25, 550)")
+      .attr("transform", "translate(0, 550)")
       .attr("font-size", "0.7rem")
       .attr("font-family", "sans-serif")
       .text("Muutos prosenteissa vuonna 2021 verrattuna vuoteen 2020.")
@@ -190,7 +189,7 @@ async function createMap(selectedmap) {
       .attr("height", 10)
       .style("fill", d => d)
       .attr("transform", (d, i) => {
-        return `translate(${i * 120 + 25}, 560)`
+        return `translate(${i * 120}, 560)`
       })
       
       legend.selectAll("text")
@@ -201,11 +200,11 @@ async function createMap(selectedmap) {
       .attr("font-family", "sans-serif")
       .text(d => d)
       .attr("transform", (d, i) => {
-        return `translate(${i * 120 + 40}, 570)`
+        return `translate(${i * 120 + 15}, 570)`
       })
       
       legend.append("text")
-        .attr("transform", "translate(25, 550)")
+        .attr("transform", "translate(0, 550)")
         .attr("font-size", "0.7rem")
         .attr("font-family", "sans-serif")
         .text("Tilikauden tulos 2021, euroa/kuntalainen.")
@@ -242,10 +241,10 @@ async function createMap(selectedmap) {
       .remove()
 
     legend.append("rect")
-      .attr("width", 300)
+      .attr("width", 330)
       .attr("height", 10)
       .style("fill", "url(#linear-gradient)")
-      .attr("transform", "translate(25, 560)")
+      .attr("transform", "translate(0, 560)")
 
     legend.selectAll("text")
       .remove()
@@ -256,7 +255,7 @@ async function createMap(selectedmap) {
       .append("text")
       .attr("y", 585)
       .attr("x", (d, i) => {
-        return `${(i) * 55 + 25}`
+        return `${(i) * 61}`
       })
       .text(d => d)
       .attr("font-size", "0.7rem")
@@ -264,13 +263,13 @@ async function createMap(selectedmap) {
       .attr("opacity", 0.8)
 
     legend.append("text")
-      .attr("transform", "translate(25, 550)")
+      .attr("transform", "translate(0, 550)")
       .attr("font-size", "0.7rem")
       .attr("font-family", "sans-serif")
       .text("Sote yhteensä vuonna 2020, euroa/kuntalainen.*")
 
     legend.append("text")
-      .attr("transform", "translate(25, 20)")
+      .attr("transform", "translate(0, 20)")
       .attr("font-size", "0.7rem")
       .attr("font-family", "sans-serif")
       .text("*Pois lukien Ahvenanmaa.")
@@ -331,17 +330,26 @@ function showTooltip(event) {
   let x = event.clientX
   let y = event.clientY + window.scrollY
 
+  console.log(x, y, window.scrollY)
+
   /* Get map border x and y coordinates. Bottom y not needed. */
-  const mapLeftBordeX = (window.innerWidth - 350) / 2
-  const mapRightBorderX = (window.innerWidth - ((window.innerWidth - 350) / 2))
-  const mapTopBorderY = 160 - window.scrollY
+  const mapLeftBorderX = (window.innerWidth - 330) / 2
+  const mapRightBorderX = (window.innerWidth - ((window.innerWidth - 330) / 2))
+  const mapTopBorderY = 152.5 - window.scrollY
+
+  console.log(mapLeftBorderX, mapRightBorderX, mapTopBorderY)
+
 
   /* Calculate x and y coordinates for map padding.
   Padding is related to tooltip div size (150x70). */
-  const xPaddingLeft = mapLeftBordeX + 80
+  const xPaddingLeft = mapLeftBorderX + 80
   const xPaddingRight = mapRightBorderX - 80
   const yPaddingTop = mapTopBorderY + 102.5 + window.scrollY
   
+
+  console.log(xPaddingLeft, xPaddingRight, yPaddingTop)
+
+
   /* Calculate padding for top when window is scrolled. */
   const yPaddingTopScrolled = window.scrollY + 102.5
 
@@ -369,8 +377,8 @@ function showTooltip(event) {
 
   /* Set visibility on tooltip to visible. Also position. */
   tooltip
-    .style("left", d => `${x - 75}px`)
-    .style("top", d => `${y - 120}px`)
+    .style("left", d => `${x - window.innerWidth / 2 + 100}px`)
+    .style("top", d => `${y - 95}px`)
     .style("visibility", "visible")
     .on("click", hideTooltip)
 

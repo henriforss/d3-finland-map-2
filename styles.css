@@ -1,29 +1,44 @@
-body {
+* {
+  padding: 0;
   margin: 0;
+  box-sizing: border-box;
+}
+
+#page {
+  position: relative;
+  width: 350px;
+  margin: 0 auto;
+  background-color: #eee;
+}
+
+#title {
+  width: 350px;
+  padding: 10px;
+}
+
+h1 {
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 10px 0;
+}
+
+p {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  margin: 8px 0;
+}
+
+select {
+  width: 330px;
+  font-size: 15px;
+  font-family: Arial, Helvetica, sans-serif;
+  padding: 5px;
+  margin: 0px 10px 10px 10px;
+  border: 0.25px solid black;
 }
 
 svg {
   display: block;
   margin: auto;
-  /* background-color: #eee; */
-}
-
-h1 {
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-p {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 0.7rem;
-  padding: 0;
-}
-
-select {
-  width: 100%;
-  font-size: 0.9rem;
-  font-family: sans-serif;
-  padding: 5px;
-  border: 0.25px solid black;
 }
 
 .municipality {
@@ -31,28 +46,16 @@ select {
   stroke-width: 0.25px;
 }
 
-#page {
-  position: relative;
+hr {
+  width: 330px;
+  margin: 0 10px;
 }
 
-#title {
-  width: 350px;
-  margin: auto;
-}
-
-#footer {
-  width: 350px;
-  margin: auto;
-}
-
-#info {
-  display: block;
-  margin: auto;
-  width: 348px;
-  height: 100px;
-  text-align: center;
+#footer p {
   font-family: Arial, Helvetica, sans-serif;
-  line-height: 0.5;
+  font-size: 10px;
+  padding: 0 10px;
+  padding-bottom: 10px;
 }
 
 #tooltip {
@@ -64,9 +67,4 @@ select {
   border-radius: 2px;
   border: 0.25px solid black;
   text-align: center;
-}
-
-#dropdown {
-  width: 350px;
-  margin: auto;
 }
